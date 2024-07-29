@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.blackjackapp.BlackjackController">
+   <children>
+      <Label fx:id="dealerDeck" alignment="CENTER" layoutY="14.0" prefHeight="200.0" prefWidth="700.0">
+         <font>
+            <Font size="140.0" />
+         </font>
+      </Label>
+      <Label fx:id="playerDeck" alignment="CENTER" layoutY="382.0" prefHeight="200.0" prefWidth="700.0">
+         <font>
+            <Font size="140.0" />
+         </font>
+      </Label>
+      <Line endX="599.0" layoutX="100.0" layoutY="218.0" startX="-100.0" />
+      <Line endX="607.0" layoutX="93.0" layoutY="382.0" startX="-100.0" />
+      <Label layoutX="310.0" layoutY="565.0" text="PLAYER">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="309.0" layoutY="-3.0" text="DEALER">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="standButton" layoutX="185.0" layoutY="260.0" mnemonicParsing="false" onAction="#stand" prefHeight="80.0" prefWidth="120.0" text="STAND" />
+      <Button fx:id="hitButton" layoutX="388.0" layoutY="260.0" mnemonicParsing="false" onAction="#hit" prefHeight="80.0" prefWidth="120.0" text="HIT" />
+      <Label fx:id="playerCardTotal" layoutX="320.0" layoutY="383.0" prefHeight="17.0" prefWidth="54.0" text="Total:" />
+      <Label fx:id="winLabel" alignment="CENTER" layoutX="305.0" layoutY="218.0" prefHeight="46.0" prefWidth="83.0" textAlignment="CENTER" />
+      <Button fx:id="restartButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#restart" text="Restart" />
+      <Label fx:id="totalWins" layoutX="14.0" layoutY="39.0" prefHeight="17.0" prefWidth="53.0" />
+      <Label fx:id="totalLosses" layoutX="14.0" layoutY="56.0" prefHeight="17.0" prefWidth="53.0" />
+   </children>
+</AnchorPane>
