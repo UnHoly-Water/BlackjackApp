@@ -2,17 +2,12 @@ package com.example.blackjackapp;
 
 
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.stage.Stage;
 
 public class BlackjackController {
 
@@ -32,6 +27,9 @@ public class BlackjackController {
     private Label totalWins;
 
     @FXML
+    private Label dealerStatus;
+
+    @FXML
     private Label totalLosses;
 
     //Initialize the hands
@@ -41,9 +39,10 @@ public class BlackjackController {
     public boolean isPlayerStanding = false;
     public boolean isDealerStanding = false;
     public boolean isGameOver = false;
-    public String dealersVisibleHand = "";
     public int winCounter = 0;
     public int lossCounter = 0;
+    public int gameID = 0;
+    public String dealersVisibleHand = "";
 
     //Deal the hands
     public static void dealHand() {
@@ -66,7 +65,6 @@ public class BlackjackController {
             dealerDeckContent.append("🂿");
             for (int i = 1; i < dealersHand.size(); i++) {
                 String card = cardUnicode.getCardUnicode(dealersHand.get(i));
-                System.out.println(dealersHand.get(i));
                 dealerDeckContent.append(card);
             }
             for (int i = 0; i < dealersHand.size(); i++) {
@@ -79,12 +77,13 @@ public class BlackjackController {
 
         for (int i = 0; i < playersHand.size(); i++) {
             String card = cardUnicode.getCardUnicode(playersHand.get(i));
-            System.out.println(playersHand.get(i));
             playerDeckContent.append(card);
         }
         int handValue = getPlayerHandValue();
         playerCardTotal.setText("Total: " + handValue);
         playerDeck.setText(playerDeckContent.toString());
+
+        dealerStatus.setText("Total: " + (getDealerHandValue() - cardValue.getCardValue(dealersHand.getFirst())));
         checkIfGameShouldEnd();
     }
 
@@ -111,36 +110,33 @@ public class BlackjackController {
     //Check winning conditions
     public void endGame() {
         //1 = Win, 2 = Lose
-        isGameOver = true;
-        revealDealersCard();
-        if (getPlayerHandValue() > 21) {
-            winLabel.setText("YOU LOSE!");
-            blackjackAudio.playLose();
-            lossCounter++;
-            return;
-        }
-        if (getDealerHandValue() > 21) {
-            winLabel.setText("YOU WIN!");
-            blackjackAudio.playWin();
-            winCounter++;
-            return;
-        }
-        if (getPlayerHandValue() == getDealerHandValue()) {
-            winLabel.setText("TIE!");
-            blackjackAudio.playWin();
-            return;
-        }
-        if (getPlayerHandValue() > getDealerHandValue()) {
-            winLabel.setText("YOU WIN!");
-            blackjackAudio.playWin();
-            winCounter++;
-            return;
-        }
-        if (getPlayerHandValue() < getDealerHandValue()) {
-            winLabel.setText("YOU LOSE!");
-            blackjackAudio.playLose();
-            lossCounter++;
-            return;
+        System.out.println("The game is over = " + isGameOver + " for gameID " + gameID);
+        if (!isGameOver) {
+            System.out.println("Endgame Processed");
+            isGameOver = true;
+            revealDealersCard();
+            dealerStatus.setText("Total: " + getDealerHandValue());
+
+            if (getPlayerHandValue() > 21 && getPlayerHandValue() != getDealerHandValue()) {
+                winLabel.setText("YOU LOSE!");
+                blackjackAudio.playLose();
+                lossCounter++;
+            } else if (getDealerHandValue() > 21 && getPlayerHandValue() != getDealerHandValue()) {
+                winLabel.setText("YOU WIN!");
+                blackjackAudio.playWin();
+                winCounter++;
+            } else if (getPlayerHandValue() == getDealerHandValue()) {
+                winLabel.setText("TIE!");
+                blackjackAudio.playWin();
+            } else if (getPlayerHandValue() > getDealerHandValue()) {
+                winLabel.setText("YOU WIN!");
+                blackjackAudio.playWin();
+                winCounter++;
+            } else if (getPlayerHandValue() < getDealerHandValue()) {
+                winLabel.setText("YOU LOSE!");
+                blackjackAudio.playLose();
+                lossCounter++;
+            }
         }
     }
 
@@ -159,11 +155,26 @@ public class BlackjackController {
     }
 
     public void dealerAssessSituation() {
-        if (getDealerHandValue() < 17) {
-            dealerHit();
-            isDealerStanding = false;
-        } else {
-            isDealerStanding = true;
+        if (!isGameOver) {
+            /*
+            This just doesn't work, I have no clue why ;-;
+
+            dealerStatus.setText("Thinking");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            */
+
+            dealerStatus.setText("Total: " + (getDealerHandValue() - cardValue.getCardValue(dealersHand.getFirst())));
+
+            if ((getDealerHandValue() < 17) && (getDealerHandValue() <= 21)) {
+                dealerHit();
+                isDealerStanding = false;
+            } else {
+                isDealerStanding = true;
+            }
         }
     }
 
@@ -187,15 +198,14 @@ public class BlackjackController {
     }
 
     public void checkIfGameShouldEnd() {
-        if (isDealerStanding) {
-            if (isPlayerStanding) {
-                endGame();
-            }
-        }
-        if (getDealerHandValue() > 21) {
+        if (isDealerStanding && isPlayerStanding && !isGameOver) {
+            System.out.println("endGame triggered because both standed");
             endGame();
-        }
-        if (getPlayerHandValue() > 21) {
+        } else if (getDealerHandValue() > 21 && !isGameOver) {
+            System.out.println("endGame triggerd because dealer busted");
+            endGame();
+        } else if (getPlayerHandValue() > 21 && !isGameOver) {
+            System.out.println("endGame triggered because player busted");
             endGame();
         }
     }
@@ -208,9 +218,11 @@ public class BlackjackController {
     }
 
     public void initialize(){
+        gameID++;
         dealHand();
         refreshDecks();
         totalWins.setText("Wins: " + winCounter);
+        totalLosses.setText("Losses: " + lossCounter);
     }
 
     @FXML
@@ -223,4 +235,7 @@ public class BlackjackController {
         initialize();
     }
 
+    public void muteSound(ActionEvent actionEvent) {
+        blackjackAudio.muteAudio();
+    }
 }
